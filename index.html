@@ -1,0 +1,212 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CWS GPM Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            padding: 20px;
+            text-align: center;
+        }
+        .step, .log, .stopwatch-section {
+            margin: 20px auto;
+            max-width: 600px;
+        }
+        .hidden {
+            display: none;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        button {
+            background-color: #1976d2;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .main-output {
+            font-size: 36px;
+            font-weight: bold;
+            color: #d32f2f;
+            margin-top: 20px;
+        }
+        .stopwatch {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .log {
+            background-color: #eeeeee;
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            text-align: left;
+        }
+        .dark-mode {
+            background-color: #1e1e1e;
+            color: #ffffff;
+        }
+        .dark-mode .log {
+            background-color: #2b2b2b;
+            color: #f1f1f1;
+        }
+        .dark-mode .main-output {
+            color: #ff6666;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="background-color:#1976d2; color:white; padding:10px; border-radius:6px;">CWS GPM Tool</h1>
+
+    <!-- Step 1 -->
+    <div class="step" id="step1">
+        <h3>Enter Operator Name</h3>
+        <input type="text" id="operatorName" placeholder="Enter your name">
+        <br>
+        <button onclick="goToStep2()">Next</button>
+        <img src="banner.png" alt="Vitamilk Banner" style="width: 100%; margin-top: 20px; border-radius: 6px;">
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step hidden" id="step2">
+        <h3>Enter Deepwell Status</h3>
+        <input type="checkbox" id="deepwell9"> Deepwell 9 - 
+        <input type="text" id="freq9" placeholder="e.g. Standby or 60Hz"><br><br>
+        <input type="checkbox" id="deepwell10"> Deepwell 10 - 
+        <input type="text" id="freq10" placeholder="e.g. Standby or 48Hz"><br><br>
+        <button onclick="goToStep3()">Next</button>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step hidden" id="step3">
+        <div class="stopwatch-section">
+            <h3>Stopwatch</h3>
+            <div class="stopwatch" id="stopwatchDisplay">00:00.00</div>
+            <button onclick="startStopwatch()">Start</button>
+            <button onclick="stopStopwatch()">Stop</button>
+            <button onclick="resetStopwatch()">Reset</button>
+            <div class="main-output" id="mainResult">GPM: 0.00</div>
+        </div>
+
+        <!-- Log -->
+        <div class="log" id="flowLog">
+            <strong id="logDateHeader">Flow Log as of:</strong><br><br>
+<div id="logContent"></div>
+        </div>
+
+        <button onclick="downloadCSV()">Download Log (CSV)</button>
+        <button onclick="clearLog()">Clear Log</button>
+        <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+    </div>
+
+<script>
+let startTime, interval, logData = [];
+
+function goToStep2() {
+    if (!document.getElementById('operatorName').value) {
+        alert("Please enter your name.");
+        return;
+    }
+    document.getElementById('step1').classList.add("hidden");
+    document.getElementById('step2').classList.remove("hidden");
+}
+
+function goToStep3() {
+    document.getElementById('step2').classList.add("hidden");
+    document.getElementById('step3').classList.remove("hidden");
+    updateDateHeader();
+}
+
+function startStopwatch() {
+    startTime = Date.now();
+    interval = setInterval(updateStopwatch, 100);
+}
+
+function stopStopwatch() {
+    clearInterval(interval);
+    const elapsed = (Date.now() - startTime) / 1000;
+    document.getElementById('stopwatchDisplay').innerText = elapsed.toFixed(2) + 's';
+    const gpm = (4.4 / elapsed) * 3600;
+    document.getElementById('mainResult').innerText = "GPM: " + gpm.toFixed(2);
+
+    const operator = document.getElementById('operatorName').value || "N/A";
+    const freq9 = document.getElementById('freq9').value || "N/A";
+    const freq10 = document.getElementById('freq10').value || "N/A";
+    const timestamp = new Date().toLocaleString();
+
+    const logEntryHTML = `[${timestamp}] Deepwell 9 - ${freq9} | Deepwell 10 - ${freq10}<br>` +
+                         `Operator: ${operator} | Time: ${elapsed.toFixed(2)}s | GPM: ${gpm.toFixed(2)}<br><br>`;
+    document.getElementById('logDateHeader').innerText = 'Recent Flow Logs as of: ' + formatDateNow();
+    document.getElementById('logContent').innerHTML += logEntryHTML;
+
+    logData.push({
+        time: timestamp,
+        operator: operator,
+        deepwell9: freq9,
+        deepwell10: freq10,
+        seconds: elapsed.toFixed(2),
+        gpm: gpm.toFixed(2)
+    });
+}
+
+function resetStopwatch() {
+    clearInterval(interval);
+    document.getElementById('stopwatchDisplay').innerText = "00:00.00";
+    document.getElementById('mainResult').innerText = "GPM: 0.00";
+}
+
+function updateStopwatch() {
+    const elapsed = (Date.now() - startTime) / 1000;
+    document.getElementById('stopwatchDisplay').innerText = elapsed.toFixed(2) + 's';
+}
+
+function clearLog() {
+    document.getElementById('logDateHeader').innerText = 'Flow Log as of:';
+    document.getElementById('logContent').innerHTML = '';
+    updateDateHeader();
+    document.getElementById('flowLog').innerHTML = "<strong id='logDateHeader'>Flow Log as of: " + formatDateNow() + "</strong><br><br>";
+    logData = [];
+}
+
+function formatDateNow() {
+    const date = new Date();
+    return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function updateDateHeader() {
+    document.getElementById('logDateHeader').innerText = "Flow Log as of: " + formatDateNow();
+}
+
+function downloadCSV() {
+    let csv = "Timestamp,Operator,Deepwell 9,Deepwell 10,Seconds,GPM\n";
+    logData.forEach(entry => {
+        csv += `${entry.time},${entry.operator},${entry.deepwell9},${entry.deepwell10},${entry.seconds},${entry.gpm}\n`;
+    });
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "flow_log.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+}
+
+
+</script>
+</body>
+</html>

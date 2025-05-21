@@ -3,27 +3,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CWS FLOWMETER READING ABN PLANT (GPM)</title>
+    <title>CWS FLOWMETER READING (GPM + Deepwell)</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f0f0f0; }
-        h1 { color: #2c3e50; }
-        .container { background: #fff; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto; }
-        button, input { padding: 10px; margin-top: 10px; border-radius: 5px; width: 100%; }
-        input { border: 1px solid #ccc; }
-        button { background-color: #2980b9; color: white; border: none; cursor: pointer; }
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f8f8f8; }
+        h1 { color: #2c3e50; text-align: center; }
+        .container { background: #fff; padding: 20px; border-radius: 10px; max-width: 650px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        label, input, button { display: block; width: 100%; margin-top: 10px; }
+        input[type="text"], input[type="number"] { padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 10px; background-color: #2980b9; color: white; border: none; border-radius: 5px; cursor: pointer; }
         button:hover { background-color: #3498db; }
-        .results, .log { margin-top: 20px; }
-        #stopwatch { font-size: 24px; margin: 10px 0; text-align: center; }
-        .log-entry { font-family: monospace; background-color: #eef; padding: 5px; margin-bottom: 5px; border-left: 3px solid #2980b9; }
+        .results { margin-top: 20px; font-size: 28px; font-weight: bold; color: #27ae60; text-align: center; }
+        .note { font-size: 14px; text-align: center; margin-top: 10px; color: #888; font-style: italic; }
+        #stopwatch { font-size: 24px; text-align: center; margin: 10px 0; }
+        .log-entry { font-family: monospace; background-color: #eef; padding: 5px; margin-bottom: 5px; border-left: 4px solid #2980b9; }
+        .log { margin-top: 30px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>CWS FLOWMETER READING ABN PLANT</h1>
-        <p><strong>Fixed Volume:</strong> 4.4 Liters (Converted to GPM)</p>
-
+        <h1>CWS FLOWMETER READING (GPM)</h1>
         <label for="operator">Operator Name:</label>
         <input type="text" id="operator" placeholder="Enter your name">
+
+        <label>Deepwell Usage and Frequency:</label>
+        <input type="checkbox" id="dw9"> Deepwell 9
+        <input type="number" id="freq9" placeholder="Frequency for Deepwell 9" value="0" step="any">
+
+        <input type="checkbox" id="dw10"> Deepwell 10
+        <input type="number" id="freq10" placeholder="Frequency for Deepwell 10" value="0" step="any">
 
         <label>Stopwatch:</label>
         <div id="stopwatch">00:00.00</div>
@@ -31,9 +38,11 @@
         <button onclick="stopStopwatch()">Stop</button>
         <button onclick="resetStopwatch()">Reset</button>
 
-        <button onclick="calculateFlow()">Calculate Flow Rate</button>
+        <button onclick="calculateFlow()">Calculate GPM</button>
 
         <div class="results" id="results"></div>
+        <div class="note">*** For ABN WTP use only</div>
+
         <div class="log">
             <h3>Flow Log</h3>
             <div id="flowLog"></div>
@@ -43,6 +52,7 @@
     <script>
         let stopwatchInterval;
         let startTime, elapsedTime = 0;
+        const conversionFactor = 4.4 * 0.264172;
 
         function startStopwatch() {
             startTime = Date.now() - elapsedTime;
@@ -73,37 +83,45 @@
 
         function calculateFlow() {
             const operator = document.getElementById("operator").value.trim();
-            const liters = 4.4;
-            const gallons = liters * 0.264172;
             const seconds = elapsedTime / 1000;
+            const dw9 = document.getElementById("dw9").checked;
+            const dw10 = document.getElementById("dw10").checked;
+            const freq9 = parseFloat(document.getElementById("freq9").value);
+            const freq10 = parseFloat(document.getElementById("freq10").value);
 
             if (!operator) {
                 alert("Please enter operator name.");
                 return;
             }
 
-            if (seconds <= 0) {
-                document.getElementById("results").innerText = "Please run the stopwatch first.";
+            if (!dw9 && !dw10) {
+                alert("Please select at least one Deepwell source.");
                 return;
             }
 
-            const gpm = (gallons / seconds) * 60;
+            if (seconds <= 0) {
+                alert("Please run the stopwatch.");
+                return;
+            }
+
+            const gallons9 = dw9 && freq9 > 0 ? freq9 * conversionFactor : 0;
+            const gallons10 = dw10 && freq10 > 0 ? freq10 * conversionFactor : 0;
+            const totalGallons = gallons9 + gallons10;
+            const gpm = (totalGallons / seconds) * 60;
+
             const now = new Date();
             const timestamp = now.toLocaleString();
+            const sources = [dw9 ? "Deepwell 9" : null, dw10 ? "Deepwell 10" : null].filter(Boolean).join(" & ");
 
-            document.getElementById("results").innerHTML = `
-                <p><strong>Time:</strong> ${seconds.toFixed(2)} seconds</p>
-                <p><strong>Gallons per Minute (GPM):</strong> ${gpm.toFixed(3)}</p>
-            `;
+            document.getElementById("results").innerHTML = `GPM: ${gpm.toFixed(2)}<br><small>(${sources})</small>`;
 
             const logEntry = document.createElement("div");
             logEntry.className = "log-entry";
-            logEntry.textContent = `[${timestamp}] Operator: ${operator} | Time: ${seconds.toFixed(2)}s | GPM: ${gpm.toFixed(3)}`;
+            logEntry.textContent = `[${timestamp}] ${sources} | Operator: ${operator} | Time: ${seconds.toFixed(2)}s | GPM: ${gpm.toFixed(2)}`;
 
             document.getElementById("flowLog").prepend(logEntry);
         }
 
-        // Auto-clear log daily
         (function autoClearLogDaily() {
             const today = new Date().toDateString();
             const lastRun = localStorage.getItem("lastLogClear");

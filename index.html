@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CWS FLOWMETER READING (GPM + Deepwell)</title>
+    <title>CWS FLOWMETER READING (GPM + Deepwell Info)</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f8f8f8; }
         h1 { color: #2c3e50; text-align: center; }
@@ -27,11 +27,8 @@
         <input type="text" id="operator" placeholder="Enter your name">
 
         <label>Deepwell Usage and Frequency:</label>
-        <input type="checkbox" id="dw9"> Deepwell 9
-        <input type="text" id="freq9" placeholder="e.g., 50hz or standby">
-
-        <input type="checkbox" id="dw10"> Deepwell 10
-        <input type="text" id="freq10" placeholder="e.g., 50hz or standby">
+        <input type="text" id="freq9" placeholder="Deepwell 9 (e.g., 50hz or standby)">
+        <input type="text" id="freq10" placeholder="Deepwell 10 (e.g., 50hz or standby)">
 
         <label>Stopwatch:</label>
         <div id="stopwatch">00:00.00</div>
@@ -54,7 +51,7 @@
     <script>
         let stopwatchInterval;
         let startTime, elapsedTime = 0;
-        const conversionFactor = 4.4 * 0.264172;
+        const conversionLitersToGallons = 4.4 * 0.264172; // fixed volume converted to gallons
 
         function startStopwatch() {
             startTime = Date.now() - elapsedTime;
@@ -87,21 +84,11 @@
         function calculateFlow() {
             const operator = document.getElementById("operator").value.trim();
             const seconds = elapsedTime / 1000;
-            const dw9 = document.getElementById("dw9").checked;
-            const dw10 = document.getElementById("dw10").checked;
-            const freq9txt = document.getElementById("freq9").value.trim();
-            const freq10txt = document.getElementById("freq10").value.trim();
-
-            const freq9num = parseFloat(freq9txt);
-            const freq10num = parseFloat(freq10txt);
+            const freq9txt = document.getElementById("freq9").value.trim() || 'standby';
+            const freq10txt = document.getElementById("freq10").value.trim() || 'standby';
 
             if (!operator) {
                 alert("Please enter operator name.");
-                return;
-            }
-
-            if (!dw9 && !dw10) {
-                alert("Please select at least one Deepwell source.");
                 return;
             }
 
@@ -110,26 +97,17 @@
                 return;
             }
 
-            const gallons9 = dw9 && !isNaN(freq9num) ? freq9num * conversionFactor : 0;
-            const gallons10 = dw10 && !isNaN(freq10num) ? freq10num * conversionFactor : 0;
-            const totalGallons = gallons9 + gallons10;
-            const gpm = (totalGallons / seconds) * 60;
-
+            const gpm = (conversionLitersToGallons / seconds) * 60;
             const now = new Date();
             const timestamp = now.toLocaleString();
 
-            const dw9status = dw9 ? `Deepwell 9 - ${freq9txt || 'standby'}` : '';
-            const dw10status = dw10 ? `Deepwell 10 - ${freq10txt || 'standby'}` : '';
-            const sourcesStatus = [dw9status, dw10status].filter(Boolean).join(" | ");
-
-            document.getElementById("statusOutput").innerHTML = `
-                ${sourcesStatus}<br>FLOWMETER CONVERTED TO GPM:
-            `;
+            const status = `Deepwell 9 - ${freq9txt} | Deepwell 10 - ${freq10txt}`;
+            document.getElementById("statusOutput").innerHTML = `${status}<br>FLOWMETER CONVERTED TO GPM:`;
             document.getElementById("results").innerHTML = `GPM: ${gpm.toFixed(2)}`;
 
             const logEntry = document.createElement("div");
             logEntry.className = "log-entry";
-            logEntry.textContent = `[${timestamp}] ${sourcesStatus} | Operator: ${operator} | Time: ${seconds.toFixed(2)}s | GPM: ${gpm.toFixed(2)}`;
+            logEntry.textContent = `[${timestamp}] ${status} | Operator: ${operator} | Time: ${seconds.toFixed(2)}s | GPM: ${gpm.toFixed(2)}`;
 
             document.getElementById("flowLog").prepend(logEntry);
         }

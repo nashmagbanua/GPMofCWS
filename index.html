@@ -101,7 +101,7 @@
 
         <!-- Log -->
         <div class="log" id="flowLog">
-            <strong id="logDateHeader">Flow Log as of:</strong><br><br>
+            <strong id="logDateHeader">Recent Flow Logs</strong><br><br>
 <div id="logContent"></div>
         </div>
 
@@ -171,10 +171,10 @@ function updateStopwatch() {
 }
 
 function clearLog() {
-    document.getElementById('logDateHeader').innerText = 'Flow Log as of:';
+    document.getElementById('logDateHeader').innerText = 'Recent Flow Logs';
     document.getElementById('logContent').innerHTML = '';
     updateDateHeader();
-    document.getElementById('flowLog').innerHTML = "<strong id='logDateHeader'>Flow Log as of: " + formatDateNow() + "</strong><br><br>";
+    document.getElementById('flowLog').innerHTML = "<strong id='logDateHeader'>Recent Flow Logs " + formatDateNow() + "</strong><br><br>";
     logData = [];
 }
 
@@ -184,7 +184,7 @@ function formatDateNow() {
 }
 
 function updateDateHeader() {
-    document.getElementById('logDateHeader').innerText = "Flow Log as of: " + formatDateNow();
+    document.getElementById('logDateHeader').innerText = "Recent Flow Logs " + formatDateNow();
 }
 
 function downloadCSV() {

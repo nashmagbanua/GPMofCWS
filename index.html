@@ -1,126 +1,224 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>CWS FLOWMETER READING (GPM + Deepwell Info)</title>
+    <title>CWS Flowmeter Tool V4 (LPH Only)</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f8f8f8; }
-        h1 { color: #2c3e50; text-align: center; }
-        .container { background: #fff; padding: 20px; border-radius: 10px; max-width: 650px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        label, input, button { display: block; width: 100%; margin-top: 10px; }
-        input[type="text"], input[type="number"] { padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        button { padding: 10px; background-color: #2980b9; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background-color: #3498db; }
-        .results { margin-top: 20px; font-size: 24px; font-weight: bold; color: #2d3436; text-align: center; }
-        .gpm-highlight { font-size: 30px; font-weight: bold; color: #27ae60; margin-top: 15px; }
-        .note { font-size: 14px; text-align: center; margin-top: 10px; color: #888; font-style: italic; }
-        #stopwatch { font-size: 24px; text-align: center; margin: 10px 0; }
-        .log-entry { font-family: monospace; background-color: #eef; padding: 5px; margin-bottom: 5px; border-left: 4px solid #2980b9; }
-        .log { margin-top: 30px; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        h1 {
+            margin-bottom: 5px;
+        }
+        .footer-note {
+            font-size: 11px;
+            color: #888;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+        .label {
+            font-weight: bold;
+            margin-bottom: 6px;
+            display: block;
+        }
+        input[type="text"] {
+            padding: 8px 10px;
+            width: 220px;
+            font-size: 14px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            outline: none;
+        }
+        input[type="checkbox"] {
+            transform: scale(1.2);
+            margin-right: 6px;
+        }
+        .stopwatch {
+            font-size: 28px;
+            font-weight: bold;
+            color: #222;
+        }
+        .main-output {
+            font-size: 30px;
+            font-weight: bold;
+            color: #d32f2f;
+        }
+        .modern-button {
+            background-color: #1976d2;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            margin: 8px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .modern-button:hover {
+            background-color: #0d47a1;
+        }
+        .log {
+            background-color: #eeeeee;
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .note {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        .dark-mode {
+            background-color: #1e1e1e;
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>CWS FLOWMETER READING (GPM)</h1>
-        <label for="operator">Operator Name:</label>
-        <input type="text" id="operator" placeholder="Enter your name">
+    <h1 style="background-color:#1976d2; color:white; padding:10px 0; border-radius:6px;">CWS Flowmeter Tool</h1>
+    <div class="footer-note">*** for ABN WTP use only</div>
 
-        <label>Deepwell Usage and Frequency:</label>
-        <input type="text" id="freq9" placeholder="Deepwell 9 (e.g., 50hz or standby)">
-        <input type="text" id="freq10" placeholder="Deepwell 10 (e.g., 50hz or standby)">
+    <div class="section">
+        <label class="label">Operator Name:</label>
+        <input type="text" id="operatorName" placeholder="Enter your name">
+    </div>
 
-        <label>Stopwatch:</label>
-        <div id="stopwatch">00:00.00</div>
-        <button onclick="startStopwatch()">Start</button>
-        <button onclick="stopStopwatch()">Stop</button>
-        <button onclick="resetStopwatch()">Reset</button>
+    <div class="section">
+        <label class="label">Deepwell Usage and Frequency:</label><br>
+        <input type="checkbox" id="deepwell9"> Deepwell 9 -
+        <input type="text" id="freq9" placeholder="e.g. Standby or 60Hz"><br>
+        <input type="checkbox" id="deepwell10"> Deepwell 10 -
+        <input type="text" id="freq10" placeholder="e.g. Standby or 48Hz">
+        <div class="note">*Input actual frequency or "Standby"</div>
+    </div>
 
-        <button onclick="calculateFlow()">Calculate GPM</button>
-
-        <div class="results" id="statusOutput"></div>
-        <div class="gpm-highlight" id="results"></div>
-        <div class="note">*** For ABN WTP use only</div>
-
-        <div class="log">
-            <h3>Flow Log</h3>
-            <div id="flowLog"></div>
+    <div class="section">
+        <label class="label">Stopwatch:</label>
+        <div class="stopwatch" id="stopwatchDisplay">00:00.00</div>
+        <div>
+            <button class="modern-button" onclick="startStopwatch()">Start</button>
+            <button class="modern-button" onclick="stopStopwatch()">Stop</button>
+            <button class="modern-button" onclick="resetStopwatch()">Reset</button>
         </div>
     </div>
 
+    <div class="section">
+        <div class="main-output" id="mainResult">0.00</div>
+    </div>
+
+    <div class="section">
+        <label class="label">Converted Units (based on LPH):</label><br>
+        <input type="checkbox" id="showLmin"> L/min
+        <input type="checkbox" id="showLsec"> L/sec
+        <div id="conversionResults"></div>
+    </div>
+
+    <div class="section">
+        <button class="modern-button" onclick="downloadCSV()">Download Log (CSV)</button>
+        <button class="modern-button" onclick="clearLog()">Clear Log</button>
+        <button class="modern-button" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+    </div>
+
+    <div class="log" id="flowLog">
+        <strong id="logDateHeader">Flow Log as of: </strong><br><br>
+    </div>
+
     <script>
-        let stopwatchInterval;
-        let startTime, elapsedTime = 0;
-        const conversionLitersToGallons = 4.4 * 0.264172; // fixed volume converted to gallons
+        let startTime, interval, logData = [];
+
+        function formatDateNow() {
+            const date = new Date();
+            return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        function updateDateHeader() {
+            document.getElementById('logDateHeader').innerText = "Flow Log as of: " + formatDateNow();
+        }
 
         function startStopwatch() {
-            startTime = Date.now() - elapsedTime;
-            stopwatchInterval = setInterval(updateStopwatch, 10);
+            startTime = Date.now();
+            interval = setInterval(updateStopwatch, 100);
         }
 
         function stopStopwatch() {
-            clearInterval(stopwatchInterval);
-            elapsedTime = Date.now() - startTime;
+            clearInterval(interval);
+            const elapsed = (Date.now() - startTime) / 1000;
+            document.getElementById('stopwatchDisplay').innerText = elapsed.toFixed(2) + 's';
+
+            const lph = (4.4 / elapsed) * 3600;
+            document.getElementById('mainResult').innerText = lph.toFixed(2);
+
+            let resultText = '';
+            if (document.getElementById('showLmin').checked) resultText += 'L/min: ' + (lph / 60).toFixed(2) + '<br>';
+            if (document.getElementById('showLsec').checked) resultText += 'L/sec: ' + (lph / 3600).toFixed(4) + '<br>';
+            document.getElementById('conversionResults').innerHTML = resultText;
+
+            const operator = document.getElementById('operatorName').value || "N/A";
+            const freq9 = document.getElementById('freq9').value || "N/A";
+            const freq10 = document.getElementById('freq10').value || "N/A";
+            const timestamp = new Date().toLocaleString();
+
+            const logEntryHTML = `[${timestamp}] Deepwell 9 - ${freq9} | Deepwell 10 - ${freq10}<br>` +
+                                 `Operator: ${operator} | Time: ${elapsed.toFixed(2)}s | LPH: ${lph.toFixed(2)}<br><br>`;
+            document.getElementById('flowLog').innerHTML += logEntryHTML;
+
+            logData.push({
+                time: timestamp,
+                operator: operator,
+                deepwell9: freq9,
+                deepwell10: freq10,
+                seconds: elapsed.toFixed(2),
+                lph: lph.toFixed(2),
+                lmin: (lph / 60).toFixed(2),
+                lsec: (lph / 3600).toFixed(4)
+            });
         }
 
         function resetStopwatch() {
-            clearInterval(stopwatchInterval);
-            elapsedTime = 0;
-            document.getElementById("stopwatch").innerText = "00:00.00";
-            document.getElementById("results").innerHTML = "";
-            document.getElementById("statusOutput").innerHTML = "";
+            clearInterval(interval);
+            document.getElementById('stopwatchDisplay').innerText = "00:00.00";
+            document.getElementById('mainResult').innerText = "0.00";
+            document.getElementById('conversionResults').innerHTML = "";
         }
 
         function updateStopwatch() {
-            let time = Date.now() - startTime;
-            let seconds = Math.floor(time / 1000);
-            let milliseconds = Math.floor((time % 1000) / 10);
-            let minutes = Math.floor(seconds / 60);
-            seconds = seconds % 60;
-            document.getElementById("stopwatch").innerText =
-                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(2, '0')}`;
+            const elapsed = (Date.now() - startTime) / 1000;
+            document.getElementById('stopwatchDisplay').innerText = elapsed.toFixed(2) + 's';
         }
 
-        function calculateFlow() {
-            const operator = document.getElementById("operator").value.trim();
-            const seconds = elapsedTime / 1000;
-            const freq9txt = document.getElementById("freq9").value.trim() || 'standby';
-            const freq10txt = document.getElementById("freq10").value.trim() || 'standby';
-
-            if (!operator) {
-                alert("Please enter operator name.");
-                return;
-            }
-
-            if (seconds <= 0) {
-                alert("Please run the stopwatch.");
-                return;
-            }
-
-            const gpm = (conversionLitersToGallons / seconds) * 60;
-            const now = new Date();
-            const timestamp = now.toLocaleString();
-
-            const status = `Deepwell 9 - ${freq9txt} | Deepwell 10 - ${freq10txt}`;
-            document.getElementById("statusOutput").innerHTML = `${status}<br>FLOWMETER CONVERTED TO GPM:`;
-            document.getElementById("results").innerHTML = `GPM: ${gpm.toFixed(2)}`;
-
-            const logEntry = document.createElement("div");
-            logEntry.className = "log-entry";
-            logEntry.textContent = `[${timestamp}] ${status} | Operator: ${operator} | Time: ${seconds.toFixed(2)}s | GPM: ${gpm.toFixed(2)}`;
-
-            document.getElementById("flowLog").prepend(logEntry);
+        function downloadCSV() {
+            let csv = "Timestamp,Operator,Deepwell 9,Deepwell 10,Seconds,LPH,L/min,L/sec\n";
+            logData.forEach(entry => {
+                csv += `${entry.time},${entry.operator},${entry.deepwell9},${entry.deepwell10},${entry.seconds},${entry.lph},${entry.lmin},${entry.lsec}\n`;
+            });
+            const blob = new Blob([csv], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "flow_log.csv";
+            a.click();
+            URL.revokeObjectURL(url);
         }
 
-        (function autoClearLogDaily() {
-            const today = new Date().toDateString();
-            const lastRun = localStorage.getItem("lastLogClear");
+        function clearLog() {
+            updateDateHeader();
+            document.getElementById('flowLog').innerHTML = "<strong id='logDateHeader'>Flow Log as of: " + formatDateNow() + "</strong><br><br>";
+            logData = [];
+        }
 
-            if (lastRun !== today) {
-                document.getElementById("flowLog").innerHTML = "";
-                localStorage.setItem("lastLogClear", today);
-            }
-        })();
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+        }
+
+        updateDateHeader();
     </script>
 </body>
 </html>

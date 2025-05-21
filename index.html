@@ -193,6 +193,7 @@
         }
 
         function clearLog() {
+    updateDateHeader();
             updateDateHeader();
             document.getElementById('flowLog').innerHTML = "<strong id='logDateHeader'>Flow Log as of: " + formatDateNow() + "</strong><br><br>";
             logData = [];

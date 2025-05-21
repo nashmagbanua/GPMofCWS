@@ -12,7 +12,8 @@
         input[type="text"], input[type="number"] { padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
         button { padding: 10px; background-color: #2980b9; color: white; border: none; border-radius: 5px; cursor: pointer; }
         button:hover { background-color: #3498db; }
-        .results { margin-top: 20px; font-size: 28px; font-weight: bold; color: #27ae60; text-align: center; }
+        .results { margin-top: 20px; font-size: 24px; font-weight: bold; color: #2d3436; text-align: center; }
+        .gpm-highlight { font-size: 30px; font-weight: bold; color: #27ae60; margin-top: 15px; }
         .note { font-size: 14px; text-align: center; margin-top: 10px; color: #888; font-style: italic; }
         #stopwatch { font-size: 24px; text-align: center; margin: 10px 0; }
         .log-entry { font-family: monospace; background-color: #eef; padding: 5px; margin-bottom: 5px; border-left: 4px solid #2980b9; }
@@ -27,10 +28,10 @@
 
         <label>Deepwell Usage and Frequency:</label>
         <input type="checkbox" id="dw9"> Deepwell 9
-        <input type="number" id="freq9" placeholder="Frequency for Deepwell 9" value="0" step="any">
+        <input type="text" id="freq9" placeholder="e.g., 50hz or standby">
 
         <input type="checkbox" id="dw10"> Deepwell 10
-        <input type="number" id="freq10" placeholder="Frequency for Deepwell 10" value="0" step="any">
+        <input type="text" id="freq10" placeholder="e.g., 50hz or standby">
 
         <label>Stopwatch:</label>
         <div id="stopwatch">00:00.00</div>
@@ -40,7 +41,8 @@
 
         <button onclick="calculateFlow()">Calculate GPM</button>
 
-        <div class="results" id="results"></div>
+        <div class="results" id="statusOutput"></div>
+        <div class="gpm-highlight" id="results"></div>
         <div class="note">*** For ABN WTP use only</div>
 
         <div class="log">
@@ -69,6 +71,7 @@
             elapsedTime = 0;
             document.getElementById("stopwatch").innerText = "00:00.00";
             document.getElementById("results").innerHTML = "";
+            document.getElementById("statusOutput").innerHTML = "";
         }
 
         function updateStopwatch() {
@@ -86,8 +89,11 @@
             const seconds = elapsedTime / 1000;
             const dw9 = document.getElementById("dw9").checked;
             const dw10 = document.getElementById("dw10").checked;
-            const freq9 = parseFloat(document.getElementById("freq9").value);
-            const freq10 = parseFloat(document.getElementById("freq10").value);
+            const freq9txt = document.getElementById("freq9").value.trim();
+            const freq10txt = document.getElementById("freq10").value.trim();
+
+            const freq9num = parseFloat(freq9txt);
+            const freq10num = parseFloat(freq10txt);
 
             if (!operator) {
                 alert("Please enter operator name.");
@@ -104,20 +110,26 @@
                 return;
             }
 
-            const gallons9 = dw9 && freq9 > 0 ? freq9 * conversionFactor : 0;
-            const gallons10 = dw10 && freq10 > 0 ? freq10 * conversionFactor : 0;
+            const gallons9 = dw9 && !isNaN(freq9num) ? freq9num * conversionFactor : 0;
+            const gallons10 = dw10 && !isNaN(freq10num) ? freq10num * conversionFactor : 0;
             const totalGallons = gallons9 + gallons10;
             const gpm = (totalGallons / seconds) * 60;
 
             const now = new Date();
             const timestamp = now.toLocaleString();
-            const sources = [dw9 ? "Deepwell 9" : null, dw10 ? "Deepwell 10" : null].filter(Boolean).join(" & ");
 
-            document.getElementById("results").innerHTML = `GPM: ${gpm.toFixed(2)}<br><small>(${sources})</small>`;
+            const dw9status = dw9 ? `Deepwell 9 - ${freq9txt || 'standby'}` : '';
+            const dw10status = dw10 ? `Deepwell 10 - ${freq10txt || 'standby'}` : '';
+            const sourcesStatus = [dw9status, dw10status].filter(Boolean).join(" | ");
+
+            document.getElementById("statusOutput").innerHTML = `
+                ${sourcesStatus}<br>FLOWMETER CONVERTED TO GPM:
+            `;
+            document.getElementById("results").innerHTML = `GPM: ${gpm.toFixed(2)}`;
 
             const logEntry = document.createElement("div");
             logEntry.className = "log-entry";
-            logEntry.textContent = `[${timestamp}] ${sources} | Operator: ${operator} | Time: ${seconds.toFixed(2)}s | GPM: ${gpm.toFixed(2)}`;
+            logEntry.textContent = `[${timestamp}] ${sourcesStatus} | Operator: ${operator} | Time: ${seconds.toFixed(2)}s | GPM: ${gpm.toFixed(2)}`;
 
             document.getElementById("flowLog").prepend(logEntry);
         }

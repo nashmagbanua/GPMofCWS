@@ -154,7 +154,7 @@
             const timestamp = new Date().toLocaleString();
 
             const logEntryHTML = `[${timestamp}] Deepwell 9 - ${freq9} | Deepwell 10 - ${freq10}<br>` +
-                                 `Operator: ${operator} | Time: ${elapsed.toFixed(2)}s | LPH: ${lph.toFixed(2)}<br><br>`;
+                                 `Operator: ${operator} | Time: ${elapsed.toFixed(2)}s | GPM: ${lph.toFixed(2)}<br><br>`;
             document.getElementById('flowLog').innerHTML += logEntryHTML;
 
             logData.push({

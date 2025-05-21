@@ -85,7 +85,7 @@
         <br>
         <button onclick="goToStep2()">Next</button>
     <img src="banner.png" alt="Vitamilk Banner" style="width: 100%; margin-top: 20px; border-radius: 6px;">
-    </div>
+</div>
 
     <!-- Step 2: Deepwell Input -->
     <div class="step hidden" id="step2">
@@ -108,7 +108,7 @@
 
         <!-- Flow Log -->
         <div class="log" id="flowLog">
-    <strong id="logDateHeader"></strong><br><br>
+            <strong id="logDateHeader">Flow Log as of: </strong><br><br>
         </div>
 
         <!-- Action Buttons -->
@@ -154,7 +154,7 @@
             const timestamp = new Date().toLocaleString();
 
             const logEntryHTML = `[${timestamp}] Deepwell 9 - ${freq9} | Deepwell 10 - ${freq10}<br>` +
-                                 `Operator: ${operator} | Time: ${elapsed.toFixed(2)}s | GPM: ${lph.toFixed(2)}<br><br>`;
+                                 `Operator: ${operator} | Time: ${elapsed.toFixed(2)}s | LPH: ${lph.toFixed(2)}<br><br>`;
             document.getElementById('flowLog').innerHTML += logEntryHTML;
 
             logData.push({
@@ -193,10 +193,10 @@
         }
 
         function clearLog() {
-    updateDateHeader();
-    document.getElementById('flowLog').innerHTML = "<strong id='logDateHeader'>Flow Log as of: " + formatDateNow() + "</strong><br><br>";
-    logData = [];
-}
+            updateDateHeader();
+            document.getElementById('flowLog').innerHTML = "<strong id='logDateHeader'>Flow Log as of: " + formatDateNow() + "</strong><br><br>";
+            logData = [];
+        }
 
         function formatDateNow() {
             const date = new Date();
@@ -216,4 +216,26 @@
 </body>
 </html>
 
-<script>window.onload = function() { updateDateHeader(); }</script>
+<script>
+    function formatDateNow() {
+        const date = new Date();
+        return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function updateDateHeader() {
+        const header = document.getElementById("logDateHeader");
+        if (header) {
+            header.innerText = "Flow Log as of: " + formatDateNow();
+        }
+    }
+
+    function clearLog() {
+        updateDateHeader();
+        document.getElementById('flowLog').innerHTML = "<strong id='logDateHeader'>Flow Log as of: " + formatDateNow() + "</strong><br><br>";
+        logData = [];
+    }
+
+    window.onload = function() {
+        updateDateHeader();
+    }
+</script>

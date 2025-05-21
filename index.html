@@ -195,7 +195,7 @@
         }
 
         function clearLog() {
-    updateDateHeader();
+    document.getElementById("logDateHeader").innerText = "Flow Log as of:";
     document.getElementById("logContent").innerHTML = "";
             updateDateHeader();
             document.getElementById('flowLog').innerHTML = "<strong id='logDateHeader'>Flow Log as of: " + formatDateNow() + "</strong><br><br>";
@@ -234,7 +234,7 @@
     }
 
     function clearLog() {
-    updateDateHeader();
+    document.getElementById("logDateHeader").innerText = "Flow Log as of:";
     document.getElementById("logContent").innerHTML = "";
         updateDateHeader();
         document.getElementById('flowLog').innerHTML = "<strong id='logDateHeader'>Flow Log as of: " + formatDateNow() + "</strong><br><br>";

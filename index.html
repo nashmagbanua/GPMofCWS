@@ -151,19 +151,18 @@ function stopStopwatch() {
     const datePart = dateTime.toLocaleDateString();
     const timePart = dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    const logEntryHTML =
-        `[${datePart}]<br>` +
-        `Operator:            ${operator}<br>` +
-        `Deepwell 9 Status:   ${status9}<br>` +
-        `Deepwell 10 Status:  ${status10}<br>` +
-        `GPM:                 ${gpm.toFixed(2)}<br>` +
-        `TIME:                ${timePart}<br><br>`;
+const logEntryHTML =
+`[${datePart}]
+Operator:            ${operator}
+Deepwell 9 Status:   ${status9}
+Deepwell 10 Status:  ${status10}
+GPM:                 ${gpm.toFixed(2)}
+TIME:                ${timePart}`;
 
     document.getElementById('stopwatchDisplay').innerText = elapsed.toFixed(2) + 's';
     document.getElementById('mainResult').innerText = "GPM: " + gpm.toFixed(2);
     document.getElementById('logDateHeader').innerText = 'Recent Flow Logs as of: ' + formatDateNow();
-    document.getElementById('logContent').innerHTML += logEntryHTML;
-
+   document.getElementById('logContent').innerHTML += `<pre style="font-family: monospace;">${logEntryHTML}</pre>`;
     logData.push({
         time: `${datePart} ${timePart}`,
         operator: operator,

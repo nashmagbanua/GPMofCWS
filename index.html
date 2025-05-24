@@ -94,8 +94,8 @@
             <h3>Stopwatch</h3>
             <div class="stopwatch" id="stopwatchDisplay">00:00.00</div>
             <button onclick="startStopwatch()">Start</button>
-            <button onclick="stopStopwatch()">Stop</button>
-            <button onclick="resetStopwatch()">Reset</button>
+<button onclick="stopStopwatch()" disabled>Stop</button>
+<button onclick="resetStopwatch()" disabled>Reset</button>
             <div class="main-output" id="mainResult">GPM: 0.00</div>
         </div>
 
@@ -129,8 +129,15 @@ function goToStep3() {
 }
 
 function startStopwatch() {
+    if (interval) return; // Prevent multiple intervals
+
     startTime = Date.now();
     interval = setInterval(updateStopwatch, 100);
+
+    // Disable Start, enable Stop/Reset
+    document.querySelector('button[onclick="startStopwatch()"]').disabled = true;
+    document.querySelector('button[onclick="stopStopwatch()"]').disabled = false;
+    document.querySelector('button[onclick="resetStopwatch()"]').disabled = false;
 }
 
 function stopStopwatch() {
@@ -171,12 +178,21 @@ TIME:                ${timePart}`;
         seconds: elapsed.toFixed(2),
         gpm: gpm.toFixed(2)
     });
+        // Enable Start, disable Stop
+    document.querySelector('button[onclick="startStopwatch()"]').disabled = false;
+    document.querySelector('button[onclick="stopStopwatch()"]').disabled = true;
 }
 
 function resetStopwatch() {
     clearInterval(interval);
+    interval = null;
     document.getElementById('stopwatchDisplay').innerText = "00:00.00";
     document.getElementById('mainResult').innerText = "GPM: 0.00";
+
+    // Enable Start, disable Stop/Reset
+    document.querySelector('button[onclick="startStopwatch()"]').disabled = false;
+    document.querySelector('button[onclick="stopStopwatch()"]').disabled = true;
+    document.querySelector('button[onclick="resetStopwatch()"]').disabled = true;
 }
 
 function updateStopwatch() {

@@ -136,25 +136,39 @@ function startStopwatch() {
 function stopStopwatch() {
     clearInterval(interval);
     const elapsed = (Date.now() - startTime) / 1000;
-    document.getElementById('stopwatchDisplay').innerText = elapsed.toFixed(2) + 's';
     const gpm = (4.4 / elapsed) * 3600;
-    document.getElementById('mainResult').innerText = "GPM: " + gpm.toFixed(2);
-
     const operator = document.getElementById('operatorName').value || "N/A";
-    const freq9 = document.getElementById('freq9').value || "N/A";
-    const freq10 = document.getElementById('freq10').value || "N/A";
-    const timestamp = new Date().toLocaleString();
 
-    const logEntryHTML = `[${timestamp}] Deepwell 9 - ${freq9} | Deepwell 10 - ${freq10}<br>` +
-                         `Operator: ${operator} | Time: ${elapsed.toFixed(2)}s | GPM: ${gpm.toFixed(2)}<br><br>`;
+    const deepwell9Checked = document.getElementById('deepwell9').checked;
+    const deepwell10Checked = document.getElementById('deepwell10').checked;
+    const freq9 = document.getElementById('freq9').value.trim();
+    const freq10 = document.getElementById('freq10').value.trim();
+
+    let status9 = deepwell9Checked ? (freq9 || "Standby/Off") : "Not Used";
+    let status10 = deepwell10Checked ? (freq10 || "Standby/Off") : "Not Used";
+
+    const dateTime = new Date();
+    const datePart = dateTime.toLocaleDateString();
+    const timePart = dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const logEntryHTML =
+        `[${datePart}]<br>` +
+        `Operator:            ${operator}<br>` +
+        `Deepwell 9 Status:   ${status9}<br>` +
+        `Deepwell 10 Status:  ${status10}<br>` +
+        `GPM:                 ${gpm.toFixed(2)}<br>` +
+        `TIME:                ${timePart}<br><br>`;
+
+    document.getElementById('stopwatchDisplay').innerText = elapsed.toFixed(2) + 's';
+    document.getElementById('mainResult').innerText = "GPM: " + gpm.toFixed(2);
     document.getElementById('logDateHeader').innerText = 'Recent Flow Logs as of: ' + formatDateNow();
     document.getElementById('logContent').innerHTML += logEntryHTML;
 
     logData.push({
-        time: timestamp,
+        time: `${datePart} ${timePart}`,
         operator: operator,
-        deepwell9: freq9,
-        deepwell10: freq10,
+        deepwell9: status9,
+        deepwell10: status10,
         seconds: elapsed.toFixed(2),
         gpm: gpm.toFixed(2)
     });

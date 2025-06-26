@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CWS GPM Tool - Enhanced</title>
+  <title>CWS GPM Tool - Report View</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <style>
     :root {
       /* Light Mode Variables */
@@ -72,13 +71,13 @@
       box-shadow: 0 6px 20px var(--shadow-color);
     }
 
-    .step, .log, .stopwatch-section {
+    .step, .log, .stopwatch-section, #reportPage { /* Include #reportPage here for shared styles */
       margin: 20px auto;
-      max-width: 600px; /* Adjusted for consistency */
+      max-width: 600px;
       background: var(--card-bg);
       border-radius: 12px;
       box-shadow: 0 6px 20px var(--shadow-color);
-      padding: 30px; /* Increased padding */
+      padding: 30px;
       transition: background-color 0.3s ease, box-shadow 0.3s ease;
     }
 
@@ -94,20 +93,20 @@
     }
 
     input[type="text"] {
-      padding: 14px; /* Slightly larger padding */
-      width: calc(100% - 28px); /* Account for padding */
+      padding: 14px;
+      width: calc(100% - 28px);
       font-size: 16px;
-      margin-bottom: 18px; /* More space */
+      margin-bottom: 18px;
       border: 1px solid var(--input-border);
-      border-radius: 8px; /* Slightly more rounded */
+      border-radius: 8px;
       box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
-      background-color: var(--card-bg); /* Match card background */
+      background-color: var(--card-bg);
       color: var(--text-color);
       transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
     }
     input[type="text"]:focus {
       border-color: var(--input-focus-border);
-      box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2); /* Focus ring effect */
+      box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
       outline: none;
     }
 
@@ -120,24 +119,24 @@
 
     .checkbox-group input[type="checkbox"] {
       margin-right: 10px;
-      transform: scale(1.3); /* Larger checkboxes */
+      transform: scale(1.3);
     }
 
     button {
       background-color: var(--button-bg);
       color: white;
-      padding: 14px 22px; /* Larger buttons */
+      padding: 14px 22px;
       border: none;
       border-radius: 8px;
-      font-size: 15px; /* Slightly larger font */
+      font-size: 15px;
       cursor: pointer;
-      margin: 8px 5px; /* More margin */
+      margin: 8px 5px;
       transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
       font-weight: 600;
     }
     button:hover {
       background-color: var(--button-hover-bg);
-      transform: translateY(-2px); /* Lift effect */
+      transform: translateY(-2px);
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
     button:disabled {
@@ -152,23 +151,23 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      justify-content: center; /* Center buttons */
+      justify-content: center;
     }
 
     .main-output {
-      font-size: 38px; /* Larger */
+      font-size: 38px;
       font-weight: 700;
       color: var(--main-output-color);
-      margin-top: 25px; /* More space */
+      margin-top: 25px;
       text-align: center;
     }
     .stopwatch {
-      font-size: 44px; /* Significantly larger */
+      font-size: 44px;
       font-weight: 700;
       background-color: var(--stopwatch-bg);
       color: var(--stopwatch-color);
       border: 2px dashed var(--stopwatch-border);
-      padding: 25px; /* More padding */
+      padding: 25px;
       border-radius: 12px;
       margin-bottom: 25px;
       text-align: center;
@@ -180,23 +179,23 @@
       background-color: var(--log-bg);
       padding: 25px;
       border-radius: 10px;
-      max-height: 350px; /* Slightly taller log */
+      max-height: 350px;
       overflow-y: auto;
       text-align: left;
-      font-family: 'Roboto Mono', monospace; /* More readable monospace font */
+      font-family: 'Roboto Mono', monospace;
       font-size: 14px;
-      border: 1px solid var(--input-border); /* Subtle border */
+      border: 1px solid var(--input-border);
       transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     .log pre {
       background-color: var(--log-entry-bg);
-      padding: 15px; /* More padding */
-      border-left: 5px solid var(--log-border-left); /* Thicker border */
-      margin-bottom: 15px; /* More margin */
+      padding: 15px;
+      border-left: 5px solid var(--log-border-left);
+      margin-bottom: 15px;
       border-radius: 8px;
       white-space: pre-wrap;
-      word-break: break-word; /* Ensure long lines wrap */
+      word-break: break-word;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
       transition: background-color 0.3s ease, border-color 0.3s ease;
     }
@@ -206,55 +205,95 @@
       display: block;
     }
 
-    /* Style specifically for the temporary report view before screenshot */
-    #reportView {
-      background-color: var(--card-bg);
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px var(--shadow-color);
-      display: none; /* Hidden by default */
-      position: absolute; /* To take it out of normal flow during capture */
-      left: -9999px; /* Hide off-screen */
-      width: 600px; /* Match the step width */
+    /* Report Page Specific Styles */
+    #reportPage h4 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: var(--text-color);
+        font-weight: 600;
+    }
+    #reportPage p {
+        margin-bottom: 8px;
+        font-size: 16px;
+    }
+    #reportPage .report-main-output {
+        font-size: 36px;
+        font-weight: 700;
+        color: var(--main-output-color);
+        margin-top: 15px;
+        margin-bottom: 15px;
+        display: block; /* Ensure it takes full width */
+        text-align: center;
+    }
+    #reportPage .report-duration {
+        font-size: 28px;
+        font-weight: 600;
+        color: var(--stopwatch-color);
+        text-align: center;
+        display: block;
+        margin-bottom: 20px;
+    }
+    #reportPage .report-log-section {
+        max-height: none; /* Allow log to expand fully in report */
+        overflow-y: visible; /* Prevent scrollbar in report */
+        padding: 20px;
+        margin-top: 25px;
+    }
+    #reportPage .report-log-section pre {
+        background-color: var(--log-entry-bg);
+        border-left: 5px solid var(--log-border-left);
+    }
+    #reportPage .report-summary {
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--input-border); /* Separator */
+        margin-bottom: 20px;
     }
 
-    #reportView .report-stopwatch {
-      font-size: 38px;
-      font-weight: 700;
-      background-color: var(--stopwatch-bg);
-      color: var(--stopwatch-color);
-      border: 2px dashed var(--stopwatch-border);
-      padding: 20px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-    #reportView .report-gpm {
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--main-output-color);
-      margin-top: 20px;
-      text-align: center;
-    }
-    #reportView .report-log {
-      background-color: var(--log-bg);
-      padding: 20px;
-      border-radius: 10px;
-      margin-top: 20px;
-      font-family: 'Roboto Mono', monospace;
-      font-size: 13px;
-      border: 1px solid var(--input-border);
-      max-height: none; /* Crucial for capturing all log entries */
-      overflow: visible; /* Crucial for capturing all log entries */
-    }
-    #reportView .report-log pre {
-      background-color: var(--log-entry-bg);
-      padding: 10px;
-      border-left: 4px solid var(--log-border-left);
-      margin-bottom: 10px;
-      border-radius: 6px;
-      white-space: pre-wrap;
-      word-break: break-word;
+
+    /* Print Media Queries */
+    @media print {
+        body {
+            background-color: #fff; /* White background for print */
+            color: #000;
+            padding: 0;
+            margin: 0;
+        }
+        .container {
+            max-width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        .header {
+            margin-bottom: 20px;
+        }
+        .header img {
+            box-shadow: none; /* No shadow in print */
+        }
+        /* Hide everything except the reportPage and the main banner when printing */
+        .step:not(#reportPage), .button-group, input, label, img:not(.header img) {
+            display: none !important;
+        }
+        #reportPage {
+            display: block !important; /* Ensure report page is visible */
+            box-shadow: none; /* No shadow in print */
+            margin: 0;
+            padding: 20px;
+            max-width: none;
+            background: #fff;
+        }
+        #reportPage .button-group {
+            display: none !important; /* Hide buttons in print */
+        }
+        #reportPage .report-log-section, #reportPage .report-summary {
+            box-shadow: none;
+            border: 1px solid #eee; /* Light border for sections in print */
+            margin-bottom: 15px;
+            page-break-inside: avoid; /* Prevent breaking sections across pages */
+        }
+        #reportPage .report-log-section pre {
+            border-left: 2px solid #ccc; /* Lighter border for log entries in print */
+            background-color: #f8f8f8;
+        }
     }
 
 
@@ -262,7 +301,7 @@
       body {
         padding: 15px;
       }
-      .step, .log, .stopwatch-section {
+      .step, .log, .stopwatch-section, #reportPage {
         padding: 20px;
         margin: 15px auto;
       }
@@ -288,13 +327,19 @@
         width: 100%;
         margin: 5px 0;
       }
+      #reportPage .report-main-output {
+        font-size: 30px;
+      }
+      #reportPage .report-duration {
+        font-size: 24px;
+      }
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <div class="header">
+    <div style="text-align: center;" class="header">
       <img src="D11ABC4D-7C11-4989-B6BB-BAE7AF1A8677.jpeg" alt="CWS GPM Tool Banner">
     </div>
 
@@ -346,24 +391,40 @@
         <button onclick="downloadCSV()">Download Log (CSV)</button>
         <button onclick="clearLog()">Clear All Logs</button>
         <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
-        <button onclick="generateReportImage()">Generate Report Image</button> <button onclick="goToStep2()">Back to Deepwell Status</button>
+        <button onclick="showReportView()">Generate Report Image</button> <button onclick="goToStep2()">Back to Deepwell Status</button>
       </div>
     </div>
-  </div>
 
-  <div id="reportView">
-    <h3 style="text-align: center;">GPM Report</h3>
-    <div class="report-stopwatch" id="reportStopwatchDisplay">00:00.00</div>
-    <div class="report-gpm" id="reportMainResult">GPM: 0.00</div>
-    <div class="report-log" id="reportFlowLog">
-      <strong class="log-header" id="reportLogDateHeader">Recent Flow Logs as of:</strong>
-      <div id="reportLogContent"></div>
+    <div class="step hidden" id="reportPage">
+        <h3 style="text-align: center; margin-bottom: 25px;">GPM Measurement Report</h3>
+
+        <div class="report-summary">
+            <h4>Latest Measurement Details:</h4>
+            <p><strong>Operator:</strong> <span id="reportOperatorName"></span></p>
+            <p><strong>Deepwell 9:</strong> <span id="reportDeepwell9Status"></span></p>
+            <p><strong>Deepwell 10:</strong> <span id="reportDeepwell10Status"></span></p>
+            <p style="font-size: 16px; margin-top: 15px;">
+                <strong>GPM:</strong> <span class="report-main-output" id="reportGPMOutput">0.00</span>
+            </p>
+            <p style="font-size: 16px;">
+                <strong>Duration:</strong> <span class="report-duration" id="reportDurationOutput">00:00.00</span>
+            </p>
+            <p style="font-style: italic; font-size: 0.9em; margin-top: 15px; text-align: center; color: #777;">
+                Formula: GPM = (4.4 / seconds) * 3600
+            </p>
+        </div>
+
+        <div class="log report-log-section" id="reportFlowLogSection">
+            <strong class="log-header" id="reportLogDateHeader">Full Flow Log:</strong>
+            <div id="reportLogContent"></div>
+        </div>
+
+        <div class="button-group print-buttons">
+            <button onclick="goToStep3FromReport()">OK</button> <button onclick="printReport()">Print Report</button>
+        </div>
     </div>
-    <p style="text-align: center; margin-top: 20px; font-size: 14px; color: #777;">
-      Formula: GPM = (4.4 / seconds) * 3600
-    </p>
-  </div>
 
+  </div>
 
 <script>
   let startTime, interval, logData = [];
@@ -385,7 +446,7 @@
     const savedLogData = localStorage.getItem('logData');
     if (savedLogData) {
       logData = JSON.parse(savedLogData);
-      renderLog(); // Render the loaded data
+      renderLog(); // Render the loaded data for the main calculator view
     }
     document.getElementById('operatorName').value = localStorage.getItem('operatorName') || '';
     document.getElementById('deepwell9').checked = localStorage.getItem('deepwell9Checked') === 'true';
@@ -398,7 +459,7 @@
     }
   }
 
-  // Render log entries from logData array
+  // Render log entries for the main calculator view
   function renderLog() {
     const logContentDiv = document.getElementById('logContent');
     logContentDiv.innerHTML = ''; // Clear existing log
@@ -415,9 +476,25 @@ Duration:            ${entry.seconds}s`; // Added duration
     logContentDiv.scrollTop = logContentDiv.scrollHeight;
   }
 
+  // Render log entries specifically for the report view
+  function renderReportLog() {
+    const reportLogContentDiv = document.getElementById('reportLogContent');
+    reportLogContentDiv.innerHTML = ''; // Clear existing report log
+    logData.forEach(entry => {
+      const logEntryHTML = `[${entry.time}]
+Operator:            ${entry.operator}
+Deepwell 9 Status:   ${entry.deepwell9}
+Deepwell 10 Status:  ${entry.deepwell10}
+GPM:                 ${entry.gpm}
+Duration:            ${entry.seconds}s`;
+      reportLogContentDiv.innerHTML += `<pre>${logEntryHTML}</pre>`;
+    });
+  }
+
   function goToStep1() {
     document.getElementById('step2').classList.add("hidden");
     document.getElementById('step3').classList.add("hidden");
+    document.getElementById('reportPage').classList.add("hidden"); // Hide report page
     document.getElementById('step1').classList.remove("hidden");
   }
 
@@ -429,15 +506,24 @@ Duration:            ${entry.seconds}s`; // Added duration
       return;
     }
     document.getElementById('step1').classList.add("hidden");
+    document.getElementById('step3').classList.add("hidden"); // Ensure step3 is hidden
+    document.getElementById('reportPage').classList.add("hidden"); // Ensure report page is hidden
     document.getElementById('step2').classList.remove("hidden");
     saveData(); // Save operator name
   }
 
   function goToStep3() {
     document.getElementById('step2').classList.add("hidden");
+    document.getElementById('reportPage').classList.add("hidden"); // Ensure report page is hidden
     document.getElementById('step3').classList.remove("hidden");
     updateDateHeader();
     saveData(); // Save deepwell status
+  }
+
+  // NEW FUNCTION: Go back from report page to Step 3 (now called OK)
+  function goToStep3FromReport() {
+    document.getElementById('reportPage').classList.add("hidden");
+    document.getElementById('step3').classList.remove("hidden");
   }
 
   function startStopwatch() {
@@ -452,10 +538,10 @@ Duration:            ${entry.seconds}s`; // Added duration
 
   function stopStopwatch() {
     if (!isTimerRunning) return; // Only stop if running
-    clearInterval(interval);
-    isTimerRunning = false;
+
+    // Capture state before stopping
     const elapsed = (Date.now() - startTime) / 1000;
-    const gpm = (4.4 / elapsed) * 3600; // Original calculation
+    const gpm = (4.4 / elapsed) * 3600;
 
     const operator = document.getElementById('operatorName').value.trim() || "N/A";
     const deepwell9Checked = document.getElementById('deepwell9').checked;
@@ -470,6 +556,7 @@ Duration:            ${entry.seconds}s`; // Added duration
     const datePart = dateTime.toLocaleDateString();
     const timePart = dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+    // Create the log entry (even if not going to report view)
     const newLogEntry = {
       time: `${datePart} ${timePart}`,
       operator: operator,
@@ -478,16 +565,30 @@ Duration:            ${entry.seconds}s`; // Added duration
       seconds: elapsed.toFixed(2),
       gpm: gpm.toFixed(2)
     };
-    logData.unshift(newLogEntry); // Add to the beginning of the array
-    renderLog(); // Re-render the log to show new entry at top
-    saveData(); // Save updated log data
 
+    // PROMPT USER HERE
+    const generateReportPrompt = confirm("Generate Report Image? Press OK to continue.");
+
+    // Always stop the timer and update the main display
+    clearInterval(interval);
+    isTimerRunning = false;
     document.getElementById('stopwatchDisplay').innerText = formatTime(elapsed);
     document.getElementById('mainResult').innerText = `GPM: ${gpm.toFixed(2)}`;
+
+    // Add log entry and save data (always happens after stopping)
+    logData.unshift(newLogEntry);
+    renderLog();
+    saveData();
     document.getElementById('logDateHeader').innerText = 'Recent Flow Logs as of: ' + formatDateNow();
 
+    // Reset button states
     document.querySelector('#step3 button:nth-of-type(1)').disabled = false; // Start button
     document.querySelector('#step3 button:nth-of-type(2)').disabled = true; // Stop button
+
+    // Conditionally show report view based on prompt
+    if (generateReportPrompt) {
+        showReportView();
+    }
   }
 
   function resetStopwatch() {
@@ -562,80 +663,36 @@ Duration:            ${entry.seconds}s`; // Added duration
     saveData(); // Save dark mode preference
   }
 
-  // NEW FUNCTION: Generate Report Image
-  async function generateReportImage() {
-    // 1. Populate the hidden report view with current data
+  // Show the live report view
+  function showReportView() {
+    // Check if there's any data to display
+    if (logData.length === 0) {
+        alert("No GPM data available to generate a report. Please record some measurements first.");
+        return;
+    }
+
+    // Hide all steps and show the report page
+    document.getElementById('step1').classList.add("hidden");
+    document.getElementById('step2').classList.add("hidden");
+    document.getElementById('step3').classList.add("hidden");
+    document.getElementById('reportPage').classList.remove("hidden");
+
+    // Populate the report page with data
     const lastLogEntry = logData[0]; // Get the most recent log entry
-    if (!lastLogEntry) {
-      alert("No GPM data available to generate a report image. Please stop the stopwatch at least once.");
-      return;
-    }
 
-    document.getElementById('reportStopwatchDisplay').innerText = lastLogEntry.seconds + 's'; // Display duration directly
-    document.getElementById('reportMainResult').innerText = `GPM: ${lastLogEntry.gpm}`;
+    document.getElementById('reportOperatorName').innerText = lastLogEntry.operator;
+    document.getElementById('reportDeepwell9Status').innerText = lastLogEntry.deepwell9;
+    document.getElementById('reportDeepwell10Status').innerText = lastLogEntry.deepwell10;
+    document.getElementById('reportGPMOutput').innerText = lastLogEntry.gpm;
+    document.getElementById('reportDurationOutput').innerText = formatTime(parseFloat(lastLogEntry.seconds));
 
-    const reportLogContentDiv = document.getElementById('reportLogContent');
-    reportLogContentDiv.innerHTML = '';
-    logData.forEach(entry => {
-      const logEntryHTML = `[${entry.time}]
-Operator:            ${entry.operator}
-Deepwell 9 Status:   ${entry.deepwell9}
-Deepwell 10 Status:  ${entry.deepwell10}
-GPM:                 ${entry.gpm}
-Duration:            ${entry.seconds}s`;
-      reportLogContentDiv.innerHTML += `<pre>${logEntryHTML}</pre>`;
-    });
-    document.getElementById('reportLogDateHeader').innerText = 'Recent Flow Logs as of: ' + formatDateNow();
+    document.getElementById('reportLogDateHeader').innerText = 'Full Flow Log as of: ' + formatDateNow();
+    renderReportLog(); // Render the full log for the report view
+  }
 
-
-    const reportArea = document.getElementById('reportView');
-
-    // Make the reportArea temporarily visible and position it off-screen for capture
-    reportArea.style.display = 'block';
-    reportArea.style.position = 'absolute';
-    reportArea.style.left = '-9999px';
-    reportArea.style.top = '-9999px';
-
-    // Apply current dark mode class to the report view for correct styling capture
-    if (document.body.classList.contains('dark-mode')) {
-      reportArea.classList.add('dark-mode');
-    } else {
-      reportArea.classList.remove('dark-mode');
-    }
-
-    try {
-      const canvas = await html2canvas(reportArea, {
-        useCORS: true,
-        scale: 2, // Capture at 2x resolution for better quality
-        logging: false, // Disable logging in console for html2canvas
-        // Ensure background is captured correctly based on current theme
-        backgroundColor: getComputedStyle(document.body).getPropertyValue('--card-bg') || getComputedStyle(document.body).backgroundColor,
-        allowTaint: true // Allow images to be rendered if they are from the same origin
-      });
-
-      // Hide the reportArea again after capture
-      reportArea.style.display = 'none';
-      reportArea.style.position = '';
-      reportArea.style.left = '';
-      reportArea.style.top = '';
-
-      const link = document.createElement('a');
-      link.download = `gpm_report_${new Date().toISOString().slice(0,10)}_latest.png`;
-      link.href = canvas.toDataURL('image/png');
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-    } catch (error) {
-      console.error("Error generating report image:", error);
-      alert("Could not generate report image. Please ensure your browser supports this feature and try again.");
-    } finally {
-      // Ensure the report area is hidden even if an error occurs
-      reportArea.style.display = 'none';
-      reportArea.style.position = '';
-      reportArea.style.left = '';
-      reportArea.style.top = '';
-    }
+  // Trigger browser print dialog
+  function printReport() {
+    window.print();
   }
 
   // Initialize on page load

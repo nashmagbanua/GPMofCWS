@@ -14,6 +14,15 @@
       text-align: center;
     }
 
+    .step {
+      margin: 20px auto;
+      max-width: 600px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
     input[type="text"] {
       padding: 10px;
       width: 80%;
@@ -37,15 +46,6 @@
       background-color: #43a047;
     }
 
-    .step, .log, .stopwatch-section {
-      margin: 20px auto;
-      max-width: 600px;
-    }
-
-    .hidden {
-      display: none;
-    }
-
     .stopwatch {
       font-size: 28px;
       font-weight: bold;
@@ -58,12 +58,12 @@
       margin-top: 20px;
     }
 
-    /* Modal Styles */
+    /* Modal popup */
     .modal {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.5);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -74,19 +74,18 @@
       display: none;
     }
 
-    .modal-content.scoreboard-style {
+    .modal-content {
       background: #fff;
-      color: #333;
-      padding: 25px;
+      padding: 30px 25px;
       border-radius: 14px;
       text-align: center;
       width: 95%;
-      max-width: 500px;
+      max-width: 460px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.25);
     }
 
     .scorebox {
-      border: 3px solid #ddd;
+      border: 3px solid #ccc;
       border-radius: 10px;
       padding: 25px 15px;
       margin-bottom: 15px;
@@ -100,7 +99,7 @@
       justify-content: space-between;
       width: 100%;
       font-family: 'Share Tech Mono', monospace;
-      font-size: 56px;
+      font-size: 52px;
       font-weight: bold;
       margin-bottom: 5px;
     }
@@ -109,16 +108,15 @@
       display: flex;
       justify-content: space-between;
       width: 100%;
-      font-size: 16px;
-      font-weight: bold;
+      font-size: 14px;
       color: #666;
     }
 
-    .result-row .time {
+    .time {
       color: #1976d2;
     }
 
-    .result-row .gpm {
+    .gpm {
       color: #d32f2f;
     }
 
@@ -138,9 +136,8 @@
 </head>
 <body>
 
-  <h2>CWS GPM TOOL</h2>
+  <h2>CWS GPM Tool</h2>
 
-  <!-- Step 1 -->
   <div class="step" id="step1">
     <h3>Enter Operator Name</h3>
     <input type="text" id="operatorName" placeholder="Enter your name">
@@ -148,33 +145,27 @@
     <button onclick="goToStep2()">Next</button>
   </div>
 
-  <!-- Step 2 -->
   <div class="step hidden" id="step2">
     <h3>Enter Deepwell Status</h3>
     <input type="checkbox" id="deepwell9"> Deepwell 9 - 
-    <input type="text" id="freq9" placeholder="e.g. 60Hz or Standby"><br><br>
+    <input type="text" id="freq9" placeholder="e.g. Standby or 60Hz"><br><br>
     <input type="checkbox" id="deepwell10"> Deepwell 10 - 
-    <input type="text" id="freq10" placeholder="e.g. 60Hz or Standby"><br><br>
+    <input type="text" id="freq10" placeholder="e.g. Standby or 48Hz"><br><br>
     <button onclick="goToStep3()">Next</button>
   </div>
 
-  <!-- Step 3 -->
   <div class="step hidden" id="step3">
-    <div class="stopwatch-section">
-      <h3>Stopwatch</h3>
-      <div class="stopwatch" id="stopwatchDisplay">00:00.00</div>
-      <button onclick="startStopwatch()">Start</button>
-      <button onclick="stopStopwatch()" disabled>Stop</button>
-      <button onclick="resetStopwatch()" disabled>Reset</button>
-      <div class="main-output" id="mainResult">GPM: 0.00</div>
-    </div>
-
-    <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+    <h3>Stopwatch</h3>
+    <div class="stopwatch" id="stopwatchDisplay">00:00.00</div>
+    <button onclick="startStopwatch()">Start</button>
+    <button onclick="stopStopwatch()" disabled>Stop</button>
+    <button onclick="resetStopwatch()" disabled>Reset</button>
+    <div class="main-output" id="mainResult">GPM: 0.00</div>
   </div>
 
-  <!-- Modal Result Popup -->
+  <!-- RESULT POPUP -->
   <div id="resultModal" class="modal hidden">
-    <div class="modal-content scoreboard-style">
+    <div class="modal-content">
       <div class="scorebox">
         <div class="result-row">
           <div class="time" id="modalTimer">00:00.00</div>
@@ -185,15 +176,14 @@
           <div>GPM</div>
         </div>
       </div>
-      <div class="log-summary" id="modalLog">
-        <!-- log content here -->
-      </div>
+      <div class="log-summary" id="modalLog"></div>
       <button onclick="closeModal()">OK</button>
     </div>
   </div>
 
   <script>
     let startTime, interval;
+
     function goToStep2() {
       const name = document.getElementById('operatorName').value.trim();
       if (!name) {
@@ -234,6 +224,7 @@
       document.getElementById('stopwatchDisplay').innerText = elapsed.toFixed(2) + "s";
       document.getElementById('mainResult').innerText = "GPM: " + gpm.toFixed(2);
 
+      // SHOW RESULT MODAL
       document.getElementById('modalTimer').innerText = elapsed.toFixed(2);
       document.getElementById('modalGPM').innerText = gpm.toFixed(2);
       document.getElementById('modalLog').innerText =
@@ -263,11 +254,6 @@ Name   :         ${operator}`;
     function closeModal() {
       document.getElementById('resultModal').classList.add("hidden");
     }
-
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark-mode");
-    }
   </script>
-
 </body>
 </html>

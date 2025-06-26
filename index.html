@@ -536,7 +536,11 @@
     </div>
 
   </div>
-
+<!-- Footer -->
+<footer style="text-align:center; font-size:13px; color:gray; margin-top:40px; padding:20px 10px; font-family:'Inter', sans-serif;">
+  © <span id="currentYear"></span> ABN Engineering Department - Utilities. This system is for internal use only.<br>
+  <a href="#" onclick="showDisclaimer()" style="color:#28a745; text-decoration:none; font-weight:500;">View Disclaimer</a>
+</footer>
 <script>
   let startTime, interval, logData = [];
   let isTimerRunning = false; // Flag to prevent multiple intervals
@@ -829,8 +833,12 @@ Duration:            ${entry.seconds}s`;
   document.addEventListener('DOMContentLoaded', () => {
     loadData();
     updateDateHeader();
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
   });
-
+// Show disclaimer when clicking "View Disclaimer" link
+  function showDisclaimer() {
+    document.getElementById('disclaimerModal').style.display = 'flex';
+  }
 </script>
 </body>
 </html>

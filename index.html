@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CWS GPM Tool - Enhanced</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <style>
     :root {
       /* Light Mode Variables */
@@ -205,6 +206,58 @@
       display: block;
     }
 
+    /* Style specifically for the temporary report view before screenshot */
+    #reportView {
+      background-color: var(--card-bg);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px var(--shadow-color);
+      display: none; /* Hidden by default */
+      position: absolute; /* To take it out of normal flow during capture */
+      left: -9999px; /* Hide off-screen */
+      width: 600px; /* Match the step width */
+    }
+
+    #reportView .report-stopwatch {
+      font-size: 38px;
+      font-weight: 700;
+      background-color: var(--stopwatch-bg);
+      color: var(--stopwatch-color);
+      border: 2px dashed var(--stopwatch-border);
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    #reportView .report-gpm {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--main-output-color);
+      margin-top: 20px;
+      text-align: center;
+    }
+    #reportView .report-log {
+      background-color: var(--log-bg);
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 13px;
+      border: 1px solid var(--input-border);
+      max-height: none; /* Crucial for capturing all log entries */
+      overflow: visible; /* Crucial for capturing all log entries */
+    }
+    #reportView .report-log pre {
+      background-color: var(--log-entry-bg);
+      padding: 10px;
+      border-left: 4px solid var(--log-border-left);
+      margin-bottom: 10px;
+      border-radius: 6px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+
     @media (max-width: 768px) {
       body {
         padding: 15px;
@@ -293,10 +346,24 @@
         <button onclick="downloadCSV()">Download Log (CSV)</button>
         <button onclick="clearLog()">Clear All Logs</button>
         <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
-        <button onclick="goToStep2()">Back to Deepwell Status</button>
+        <button onclick="generateReportImage()">Generate Report Image</button> <button onclick="goToStep2()">Back to Deepwell Status</button>
       </div>
     </div>
   </div>
+
+  <div id="reportView">
+    <h3 style="text-align: center;">GPM Report</h3>
+    <div class="report-stopwatch" id="reportStopwatchDisplay">00:00.00</div>
+    <div class="report-gpm" id="reportMainResult">GPM: 0.00</div>
+    <div class="report-log" id="reportFlowLog">
+      <strong class="log-header" id="reportLogDateHeader">Recent Flow Logs as of:</strong>
+      <div id="reportLogContent"></div>
+    </div>
+    <p style="text-align: center; margin-top: 20px; font-size: 14px; color: #777;">
+      Formula: GPM = (4.4 / seconds) * 3600
+    </p>
+  </div>
+
 
 <script>
   let startTime, interval, logData = [];
@@ -493,6 +560,82 @@ Duration:            ${entry.seconds}s`; // Added duration
   function toggleDarkMode() {
     document.body.classList.toggle("dark-mode");
     saveData(); // Save dark mode preference
+  }
+
+  // NEW FUNCTION: Generate Report Image
+  async function generateReportImage() {
+    // 1. Populate the hidden report view with current data
+    const lastLogEntry = logData[0]; // Get the most recent log entry
+    if (!lastLogEntry) {
+      alert("No GPM data available to generate a report image. Please stop the stopwatch at least once.");
+      return;
+    }
+
+    document.getElementById('reportStopwatchDisplay').innerText = lastLogEntry.seconds + 's'; // Display duration directly
+    document.getElementById('reportMainResult').innerText = `GPM: ${lastLogEntry.gpm}`;
+
+    const reportLogContentDiv = document.getElementById('reportLogContent');
+    reportLogContentDiv.innerHTML = '';
+    logData.forEach(entry => {
+      const logEntryHTML = `[${entry.time}]
+Operator:            ${entry.operator}
+Deepwell 9 Status:   ${entry.deepwell9}
+Deepwell 10 Status:  ${entry.deepwell10}
+GPM:                 ${entry.gpm}
+Duration:            ${entry.seconds}s`;
+      reportLogContentDiv.innerHTML += `<pre>${logEntryHTML}</pre>`;
+    });
+    document.getElementById('reportLogDateHeader').innerText = 'Recent Flow Logs as of: ' + formatDateNow();
+
+
+    const reportArea = document.getElementById('reportView');
+
+    // Make the reportArea temporarily visible and position it off-screen for capture
+    reportArea.style.display = 'block';
+    reportArea.style.position = 'absolute';
+    reportArea.style.left = '-9999px';
+    reportArea.style.top = '-9999px';
+
+    // Apply current dark mode class to the report view for correct styling capture
+    if (document.body.classList.contains('dark-mode')) {
+      reportArea.classList.add('dark-mode');
+    } else {
+      reportArea.classList.remove('dark-mode');
+    }
+
+    try {
+      const canvas = await html2canvas(reportArea, {
+        useCORS: true,
+        scale: 2, // Capture at 2x resolution for better quality
+        logging: false, // Disable logging in console for html2canvas
+        // Ensure background is captured correctly based on current theme
+        backgroundColor: getComputedStyle(document.body).getPropertyValue('--card-bg') || getComputedStyle(document.body).backgroundColor,
+        allowTaint: true // Allow images to be rendered if they are from the same origin
+      });
+
+      // Hide the reportArea again after capture
+      reportArea.style.display = 'none';
+      reportArea.style.position = '';
+      reportArea.style.left = '';
+      reportArea.style.top = '';
+
+      const link = document.createElement('a');
+      link.download = `gpm_report_${new Date().toISOString().slice(0,10)}_latest.png`;
+      link.href = canvas.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+    } catch (error) {
+      console.error("Error generating report image:", error);
+      alert("Could not generate report image. Please ensure your browser supports this feature and try again.");
+    } finally {
+      // Ensure the report area is hidden even if an error occurs
+      reportArea.style.display = 'none';
+      reportArea.style.position = '';
+      reportArea.style.left = '';
+      reportArea.style.top = '';
+    }
   }
 
   // Initialize on page load

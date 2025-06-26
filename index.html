@@ -1,117 +1,172 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CWS GPM Tool</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f9f9f9;
-            color: #333;
-            padding: 20px;
-            text-align: center;
-        }
-        .step, .log, .stopwatch-section {
-            margin: 20px auto;
-            max-width: 600px;
-        }
-        .hidden {
-            display: none;
-        }
-        input[type="text"] {
-            padding: 10px;
-            width: 80%;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-        button {
-            background-color: #1976d2;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
-            margin: 5px;
-        }
-        .main-output {
-            font-size: 36px;
-            font-weight: bold;
-            color: #d32f2f;
-            margin-top: 20px;
-        }
-        .stopwatch {
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .log {
-            background-color: #eeeeee;
-            padding: 15px;
-            border-radius: 8px;
-            max-height: 300px;
-            overflow-y: auto;
-            text-align: left;
-        }
-        .dark-mode {
-            background-color: #1e1e1e;
-            color: #ffffff;
-        }
-        .dark-mode .log {
-            background-color: #2b2b2b;
-            color: #f1f1f1;
-        }
-        .dark-mode .main-output {
-            color: #ff6666;
-        }
-    </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CWS GPM Tool</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f5f7fa;
+      color: #333;
+      padding: 20px;
+      margin: 0;
+    }
+    .step, .log, .stopwatch-section {
+      margin: 20px auto;
+      max-width: 600px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      padding: 25px;
+    }
+    .hidden { display: none; }
+
+    input[type="text"] {
+      padding: 12px;
+      width: 100%;
+      font-size: 16px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    }
+    input[type="text"]:focus {
+      border-color: #1976d2;
+      outline: none;
+    }
+
+    button {
+      background-color: #1976d2;
+      color: white;
+      padding: 12px 18px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      margin: 6px 4px;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    button:hover {
+      background-color: #145ea8;
+      transform: scale(1.02);
+    }
+
+    .main-output {
+      font-size: 32px;
+      font-weight: 600;
+      color: #d32f2f;
+      margin-top: 20px;
+    }
+    .stopwatch {
+      font-size: 30px;
+      font-weight: 600;
+      background-color: #f0f4ff;
+      color: #1976d2;
+      border: 2px dashed #1976d2;
+      padding: 18px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .log {
+      background-color: #f1f1f1;
+      padding: 20px;
+      border-radius: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+      text-align: left;
+      font-family: monospace;
+      font-size: 13px;
+    }
+
+    .log pre {
+      background-color: #fff;
+      padding: 10px;
+      border-left: 4px solid #1976d2;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      white-space: pre-wrap;
+    }
+
+    .dark-mode {
+      background-color: #1e1e1e;
+      color: #eeeeee;
+    }
+    .dark-mode input,
+    .dark-mode button {
+      background-color: #2b2b2b;
+      color: #eeeeee;
+      border: 1px solid #555;
+    }
+    .dark-mode .log {
+      background-color: #2a2a2a;
+      color: #f1f1f1;
+    }
+    .dark-mode .stopwatch {
+      background-color: #222;
+      border-color: #90caf9;
+      color: #90caf9;
+    }
+    .dark-mode .main-output {
+      color: #ff6666;
+    }
+
+    @media (max-width: 600px) {
+      button, input[type="text"] {
+        width: 100%;
+        margin: 10px 0;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div style="text-align: center; margin-top: 10px; margin-bottom: 20px;">
-      <img src="D11ABC4D-7C11-4989-B6BB-BAE7AF1A8677.jpeg" 
-           alt="CWS GPM Tool Banner" 
-           style="max-width: 100%; height: auto;">
+
+  <div style="text-align: center;">
+    <img src="D11ABC4D-7C11-4989-B6BB-BAE7AF1A8677.jpeg" 
+         alt="CWS GPM Tool Banner" 
+         style="max-width: 100%; height: auto; border-radius: 10px;">
+  </div>
+
+  <!-- Step 1 -->
+  <div class="step" id="step1">
+    <h3>Enter Operator Name</h3>
+    <input type="text" id="operatorName" placeholder="Enter your name">
+    <button onclick="goToStep2()">Next</button>
+    <img src="banner.png" alt="Vitamilk Banner" 
+         style="width: 100%; margin-top: 20px; border-radius: 6px;">
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step hidden" id="step2">
+    <h3>Enter Deepwell Status</h3>
+    <label><input type="checkbox" id="deepwell9"> Deepwell 9 - </label>
+    <input type="text" id="freq9" placeholder="e.g. Standby or 60Hz"><br><br>
+    <label><input type="checkbox" id="deepwell10"> Deepwell 10 - </label>
+    <input type="text" id="freq10" placeholder="e.g. Standby or 48Hz"><br><br>
+    <button onclick="goToStep3()">Next</button>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step hidden" id="step3">
+    <div class="stopwatch-section">
+      <h3>Stopwatch</h3>
+      <div class="stopwatch" id="stopwatchDisplay">00:00.00</div>
+      <button onclick="startStopwatch()">Start</button>
+      <button onclick="stopStopwatch()" disabled>Stop</button>
+      <button onclick="resetStopwatch()" disabled>Reset</button>
+      <div class="main-output" id="mainResult">GPM: 0.00</div>
     </div>
 
-    <!-- Step 1 -->
-    <div class="step" id="step1">
-        <h3>Enter Operator Name</h3>
-        <input type="text" id="operatorName" placeholder="Enter your name">
-        <br>
-        <button onclick="goToStep2()">Next</button>
-        <img src="banner.png" alt="Vitamilk Banner" style="width: 100%; margin-top: 20px; border-radius: 6px;">
+    <div class="log" id="flowLog">
+      <strong id="logDateHeader">Flow Log as of:</strong><br><br>
+      <div id="logContent"></div>
     </div>
 
-    <!-- Step 2 -->
-    <div class="step hidden" id="step2">
-        <h3>Enter Deepwell Status</h3>
-        <input type="checkbox" id="deepwell9"> Deepwell 9 - 
-        <input type="text" id="freq9" placeholder="e.g. Standby or 60Hz"><br><br>
-        <input type="checkbox" id="deepwell10"> Deepwell 10 - 
-        <input type="text" id="freq10" placeholder="e.g. Standby or 48Hz"><br><br>
-        <button onclick="goToStep3()">Next</button>
-    </div>
-
-    <!-- Step 3 -->
-    <div class="step hidden" id="step3">
-        <div class="stopwatch-section">
-            <h3>Stopwatch</h3>
-            <div class="stopwatch" id="stopwatchDisplay">00:00.00</div>
-            <button onclick="startStopwatch()">Start</button>
-            <button onclick="stopStopwatch()" disabled>Stop</button>
-            <button onclick="resetStopwatch()" disabled>Reset</button>
-            <div class="main-output" id="mainResult">GPM: 0.00</div>
-        </div>
-
-        <div class="log" id="flowLog">
-            <strong id="logDateHeader">Flow Log as of:</strong><br><br>
-            <div id="logContent"></div>
-        </div>
-
-        <button onclick="downloadCSV()">Download Log (CSV)</button>
-        <button onclick="clearLog()">Clear Log</button>
-        <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
-    </div>
+    <button onclick="downloadCSV()">Download Log (CSV)</button>
+    <button onclick="clearLog()">Clear Log</button>
+    <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+  </div>
 
 <script>
 let startTime, interval, logData = [];
@@ -163,7 +218,7 @@ TIME:                ${timePart}`;
     document.getElementById('stopwatchDisplay').innerText = elapsed.toFixed(2) + 's';
     document.getElementById('mainResult').innerText = "GPM: " + gpm.toFixed(2);
     document.getElementById('logDateHeader').innerText = 'Recent Flow Logs as of: ' + formatDateNow();
-    document.getElementById('logContent').innerHTML += `<pre style="font-family: monospace;">${logEntryHTML}</pre>`;
+    document.getElementById('logContent').innerHTML += `<pre>${logEntryHTML}</pre>`;
     logData.push({
         time: `${datePart} ${timePart}`,
         operator: operator,

@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nutribev Corporation Csw GpM Tool</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- PWA Support -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00c853">
+
+<!-- iOS Support (optional) -->
+<link rel="apple-touch-icon" href="abnlogo.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
   <style>
     :root {
       /* Green and White Theme Colors */
@@ -865,6 +873,14 @@ function closeDisclaimer() {
   document.getElementById('disclaimerModal').style.display = 'none';
   localStorage.setItem('abnDisclaimerAccepted', 'true');
 }
+ // ✅ Service Worker Registration
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('✅ Service Worker registered!', reg))
+        .catch(err => console.error('❌ Service Worker registration failed:', err));
+      });
+    }
 </script>
 </body>
 </html>

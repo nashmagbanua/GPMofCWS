@@ -681,14 +681,9 @@ Duration:            ${entry.seconds}s`;
     if (!isTimerRunning) return;
 
     // Get the raw elapsed time
-    const rawElapsed = (Date.now() - startTime) / 1000;
-
-    // Round elapsed time to 2 decimal places for consistency with display and user's calculator input
-    const elapsedSecondsRounded = rawElapsed.toFixed(2);
-
-    // Calculate GPM using the rounded elapsed time, as per the user's exact formula matching
-    const gpm = (1 / parseFloat(elapsedSecondsRounded)) * 3600 * 4.4;
-
+   const rawElapsed = (Date.now() - startTime) / 1000;
+   const gpm = (1 / rawElapsed) * 3600 * 4.4;
+   const elapsedSecondsRounded = rawElapsed.toFixed(2); // for display only
     const operator = document.getElementById('operatorName').value.trim() || "N/A";
     const shiftType = document.getElementById('shiftType').value || "N/A";
     const deepwell9Checked = document.getElementById('deepwell9').checked;
